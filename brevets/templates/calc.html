@@ -114,19 +114,16 @@
          <script type="text/javascript">
             var SCRIPT_ROOT = {{ request.script_root|tojson|safe }} ;
             var TIME_CALC_URL = SCRIPT_ROOT + "/_calc_times";
-
-            // FIX ME!
-            // Right now, only the kilometers are passed
-            // you need to pass much more!
-            // View flask_brevets.py for details.
             function calc_times(control) {
               var km = control.find("input[name='km']").val();
+              var brev_dist = $("#brevet_dist_km").val();
+              var start_time = $("#begin_date").val();
               var open_time_field = control.find("input[name='open']");
               var close_time_field = control.find("input[name='close']");
-
-              $.getJSON(TIME_CALC_URL, {km: km}).done(
+              $.getJSON(TIME_CALC_URL, {km: km, start_time: start_time, brev_dist: brev_dist}).done(
                 function(data) {
                    var times = data.result;
+
                    console.log("Got a response: ");
                    console.log("Response.open = " + times.open);
                    // This part will automatically fill the open and close slots,
@@ -150,10 +147,21 @@
                        var km = (1.609344 * miles).toFixed(6) ;
                        console.log("Converted " + miles + " miles to " + km + " kilometers");
                        var control_entry = $(this).parents(".control")
-                       var target = control_entry.find("input[name='km']");
-                       target.val( km );
-                       // Then calculate times for this entry
-                       calc_times(control_entry);
+                       var target_mi = control_entry.find("input[name='miles']");
+                       var target_km = control_entry.find("input[name='km']");
+                       var brev_dist = $("#brevet_dist_km").val();
+                       var open_time_field = control_entry.find("input[name='open']");
+                       var close_time_field = control_entry.find("input[name='close']");
+                       if (km >= (1.2 * brev_dist)){
+                          alert("The control point(" + km + "km) is over 20% longer than the theoretical distance(" + brev_dist + "km) Retype the control location!");
+                          target_km.val("")
+                          target_mi.val("")
+                          open_time_field.val("mm/dd/yyyy, --:-- --")
+                          close_time_field.val("mm/dd/yyyy, --:-- --")
+                       } else{
+                            target_km.val( km );
+                            calc_times(control_entry);
+                       }
                     });
 
                 $('input[name="km"]').change(
@@ -162,10 +170,22 @@
                        var miles = (0.621371 * km).toFixed(6) ;
                        console.log("Converted " + km + " km to " + miles + " miles");
                        var control_entry = $(this).parents(".control")
-                       var target = control_entry.find("input[name='miles']");
-                       target.val( miles );
+                       var target_mi = control_entry.find("input[name='miles']");
+                       var target_km = control_entry.find("input[name='km']");
+                       var brev_dist = $("#brevet_dist_km").val();
+                       var open_time_field = control_entry.find("input[name='open']");
+                       var close_time_field = control_entry.find("input[name='close']");
+                       if (km >= (1.2 * brev_dist)){
+                          alert("The control point(" + km + "km) is over 20% longer than the theoretical distance(" + brev_dist + "km) Retype the control location!");
+                          target_km.val("")
+                          target_mi.val("")
+                          open_time_field.val("mm/dd/yyyy, --:-- --")
+                          close_time_field.val("mm/dd/yyyy, --:-- --")
+                       } else{
+                            target_mi.val( miles );
+                            calc_times(control_entry);
+                       }
                        // Then calculate times for this entry
-                       calc_times(control_entry);
                     });
 
                });
