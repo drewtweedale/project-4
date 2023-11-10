@@ -52,7 +52,7 @@ def _calc_times():
     app.logger.debug("Got a JSON request")
     km = request.args.get('km', 999, type=float)
     start_time = request.args.get('start_time')
-    brevet_dist = request.args.get('brev_dist')
+    brevet_dist = request.args.get('brev_dist', type=float)
     app.logger.debug("km={}".format(km))
     app.logger.debug("request.args: {}".format(request.args))
     open_time = acp_times.open_time(km, brevet_dist, arrow.get(start_time)).format('YYYY-MM-DDTHH:mm')
